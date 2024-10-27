@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Box } from '@mui/material';
-import ChatBubble from './ChatBubble';
+import React, { useEffect, useRef, useState } from "react";
+import { Box } from "@mui/material";
+import ChatBubble from "./ChatBubble";
 
 function ChatWindow({ messages }) {
   const chatEndRef = useRef(null); // Reference to the end of chat window
@@ -19,7 +19,7 @@ function ChatWindow({ messages }) {
   // Scroll to bottom effect when dummy changes
   useEffect(() => {
     if (shouldAutoScroll && chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [dummy, shouldAutoScroll]); // Trigger when dummy or messages change, or when shouldAutoScroll is true
 
@@ -65,19 +65,20 @@ function ChatWindow({ messages }) {
       display="flex"
       flexDirection="column"
       sx={{
+        borderRadius: "12px 12px 0 0",
         paddingLeft: {
-          xs: 2,  // Padding for extra-small screens (phones)
-          sm: 12,  // Padding for small screens (phones)
-          md: 24,  // Increased padding for medium screens (tablets)
-          lg: 36,  // Larger padding for large screens (laptops)
-          xl: 48,  // Even larger padding for extra-large screens (desktops)
+          xs: 2, // Padding for extra-small screens (phones)
+          sm: 12, // Padding for small screens (phones)
+          md: 24, // Increased padding for medium screens (tablets)
+          lg: 36, // Larger padding for large screens (laptops)
+          xl: 48, // Even larger padding for extra-large screens (desktops)
         },
         paddingRight: {
-          xs: 2,  // Padding for extra-small screens (phones)
-          sm: 12,  // Padding for small screens (phones)
-          md: 24,  // Increased padding for medium screens (tablets)
-          lg: 36,  // Larger padding for large screens (laptops)
-          xl: 48,  // Even larger padding for extra-large screens (desktops)
+          xs: 2, // Padding for extra-small screens (phones)
+          sm: 12, // Padding for small screens (phones)
+          md: 24, // Increased padding for medium screens (tablets)
+          lg: 36, // Larger padding for large screens (laptops)
+          xl: 48, // Even larger padding for extra-large screens (desktops)
         },
       }}
     >

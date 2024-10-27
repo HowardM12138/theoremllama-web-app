@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button } from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
+import React, { useState } from "react";
+import { Box, TextField, Button } from "@mui/material";
+import SendIcon from "@mui/icons-material/Send";
 
 // Component for text input and send button
 function ChatInput({ onSendMessage }) {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
 
   const handleSend = () => {
-    if (inputValue.trim() !== '') {
+    if (inputValue.trim() !== "") {
       onSendMessage(inputValue);
-      setInputValue('');
+      setInputValue("");
     }
   };
 
   const handleKeyDown = (e) => {
     // Check if the Enter key is pressed without Shift
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Prevent newline from being added to the input
       handleSend();
     }
@@ -23,7 +23,13 @@ function ChatInput({ onSendMessage }) {
   };
 
   return (
-    <Box display="flex" p={2} borderTop={1} borderColor="grey.300" bgcolor="white">
+    <Box
+      display="flex"
+      p={2}
+      borderTop={1}
+      borderColor="grey.300"
+      bgcolor="white"
+    >
       <TextField
         variant="outlined"
         fullWidth
@@ -35,8 +41,11 @@ function ChatInput({ onSendMessage }) {
         multiline
         maxRows={5} // Limit the TextField to a maximum of 5 rows
         sx={{
-          '& .MuiInputBase-root': {
-            overflowY: 'auto', // Enable vertical scrolling if needed
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "15px",
+          },
+          "& .MuiInputBase-root": {
+            overflowY: "auto",
           },
         }}
       />
@@ -45,9 +54,18 @@ function ChatInput({ onSendMessage }) {
         variant="contained"
         color="primary"
         onClick={handleSend}
-        sx={{ marginLeft: 2 }}
+        sx={{
+          marginLeft: 2,
+          borderRadius: "15px",
+        }}
       >
-        <SendIcon />
+        <SendIcon
+          sx={{
+            borderRadius: "50%",
+            transform: "rotate(-45deg)",
+            padding: "4px",
+          }}
+        />
       </Button>
     </Box>
   );
