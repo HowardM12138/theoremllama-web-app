@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import ChatBubble from "./ChatBubble";
 
 function ChatWindow({ messages }) {
@@ -8,6 +8,7 @@ function ChatWindow({ messages }) {
   const prevScrollTopRef = useRef(0); // Track the previous scroll position
   const [dummy, setDummy] = useState(0); // Dummy state to trigger scrolling
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true); // State to control auto-scroll
+  const [generating, setGenerating] = useState(false); // State to track if msg is generating
   const bottomThreshold = 50; // Threshold distance from the bottom to enable auto-scroll
 
   // Handle new messages and triggering auto-scrolling
@@ -54,38 +55,85 @@ function ChatWindow({ messages }) {
     prevScrollTopRef.current = currentScrollTop;
   };
 
+  const handleStopGeneration = () => {
+    messages.at(-1).stop = true;
+    setGenerating(false);
+  };
+
   return (
     <Box
-      ref={chatWindowRef}
-      onScroll={handleScroll}
-      flex={1}
-      p={2}
-      overflow="auto"
-      bgcolor="grey.100"
       display="flex"
       flexDirection="column"
+      height="100%"
+      p={2}
+      bgcolor="grey.100"
       sx={{
         borderRadius: "12px 12px 0 0",
-        paddingLeft: {
-          xs: 2, // Padding for extra-small screens (phones)
-          sm: 12, // Padding for small screens (phones)
-          md: 24, // Increased padding for medium screens (tablets)
-          lg: 36, // Larger padding for large screens (laptops)
-          xl: 48, // Even larger padding for extra-large screens (desktops)
-        },
-        paddingRight: {
-          xs: 2, // Padding for extra-small screens (phones)
-          sm: 12, // Padding for small screens (phones)
-          md: 24, // Increased padding for medium screens (tablets)
-          lg: 36, // Larger padding for large screens (laptops)
-          xl: 48, // Even larger padding for extra-large screens (desktops)
-        },
+        overflow: "hidden",
       }}
     >
-      {messages.map((msg, index) => (
-        <ChatBubble key={index} msg={msg} onCharacterTyped={triggerScroll} />
-      ))}
-      <div ref={chatEndRef} />
+      <Box
+        ref={chatWindowRef}
+        onScroll={handleScroll}
+        flex={1}
+        overflow="auto"
+        bgcolor="grey.100"
+        display="flex"
+        mb={2}
+        flexDirection="column"
+        sx={{
+          maxHeight: "80vh",
+          paddingLeft: {
+            xs: 2, // Padding for extra-small screens (phones)
+            sm: 10, // Padding for small screens (phones)
+            md: 21, // Increased padding for medium screens (tablets)
+            lg: 28, // Larger padding for large screens (laptops)
+            xl: 35, // Even larger padding for extra-large screens (desktops)
+          },
+          paddingRight: {
+            xs: 2, // Padding for extra-small screens (phones)
+            sm: 10, // Padding for small screens (phones)
+            md: 21, // Increased padding for medium screens (tablets)
+            lg: 28, // Larger padding for large screens (laptops)
+            xl: 35, // Even larger padding for extra-large screens (desktops)
+          },
+        }}
+      >
+        {messages.map((msg, index) => (
+          <ChatBubble
+            key={index}
+            msg={msg}
+            onCharacterTyped={triggerScroll}
+            setGenerating={setGenerating}
+          />
+        ))}
+        <div ref={chatEndRef} />
+      </Box>
+      {generating && (
+        <Button
+          variant="contained"
+          onClick={handleStopGeneration}
+          sx={{
+            backgroundColor: "#e0e0e0",
+            padding: "12px 16px",
+            borderRadius: "12px",
+            alignSelf: "center",
+            minHeight: "48px",
+            textTransform: "none",
+          }}
+        >
+          <Box
+            sx={{
+              width: 15,
+              height: 15,
+              backgroundColor: "#1976d2", // Green color for the square
+              borderRadius: "4px",
+              marginRight: "6px",
+            }}
+          />
+          <Typography color="textPrimary">Stop generating…</Typography>
+        </Button>
+      )}
     </Box>
   );
 }

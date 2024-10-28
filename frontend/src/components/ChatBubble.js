@@ -5,7 +5,7 @@ import SmartToyIcon from "@mui/icons-material/SmartToy";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/Share";
 
-function ChatBubble({ msg, onCharacterTyped }) {
+function ChatBubble({ msg, onCharacterTyped, setGenerating }) {
   const [displayedText, setDisplayedText] = useState(""); // The current portion of displayed text
   const [currentIndex, setCurrentIndex] = useState(0); // Index to keep track of characters to be typed
   const typingInterval = 5; // Time interval in milliseconds
@@ -14,10 +14,14 @@ function ChatBubble({ msg, onCharacterTyped }) {
   useEffect(() => {
     setDisplayedText("");
     setCurrentIndex(0);
+    if (msg.sender === "bot" && msg.id !== "thinking") setGenerating(true);
   }, [msg.id]);
 
   // Effect to handle typing animation
   useEffect(() => {
+    if (msg.stop) {
+      return;
+    }
     // Only start typing effect if it's a bot message
     if (msg.sender === "bot" && currentIndex < msg.text.length) {
       // Set timeout for typing effect
@@ -34,8 +38,10 @@ function ChatBubble({ msg, onCharacterTyped }) {
     } else if (msg.sender !== "bot") {
       // Directly set the message for user input
       setDisplayedText(msg.text);
+    } else if (msg.id !== "thinking") {
+      setGenerating(false);
     }
-  }, [currentIndex, msg]); // Depend on `currentIndex` and `msg` for effect
+  }, [currentIndex, msg, msg.stop]); // Depend on `currentIndex` and `msg` for effect
 
   const handleCopyClick = () => {
     if (navigator.clipboard) {

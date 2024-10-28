@@ -10,7 +10,7 @@ function App() {
   // State to keep track of chat messages
   const [messages, setMessages] = useState([
     {
-      id: generateUniqueId(),
+      id: "thinking",
       sender: "bot",
       text: "What can I help you with today?",
     },
