@@ -2,9 +2,36 @@ import React, { useState } from "react";
 import ChatWindow from "./components/ChatWindow";
 import ChatInput from "./components/ChatInput";
 import { Container, Box } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // Generate unique ID for messages
 const generateUniqueId = () => `_${Math.random().toString(36).substr(2, 9)}`;
+
+const theme = createTheme({
+  typography: {
+    fontFamily: "'Roboto', Arial, sans-serif",
+    body1: {
+      fontSize: "16px",
+    },
+    h1: {
+      fontSize: "2rem",
+      fontWeight: 500,
+    },
+    h2: {
+      fontSize: "1.75rem",
+      fontWeight: 500,
+    },
+  },
+  components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          fontFamily: "'Roboto', Arial, sans-serif",
+        },
+      },
+    },
+  },
+});
 
 function App() {
   // State to keep track of chat messages
@@ -50,47 +77,51 @@ function App() {
   };
 
   return (
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      sx={{
-        backgroundColor: "grey.100",
-      }}
-    >
-      <Container
-        maxWidth={false}
-        sx={{
-          width: {
-            xs: "95%", // Full width on extra-small screens (phones)
-            sm: "95%", // Full width on small screens (phones)
-            md: "80%", // 80% width on medium screens (tablets)
-            lg: "80%", // 70% width on large screens (laptops)
-            xl: "80%", // 60% width on extra-large screens (desktops)
-          },
-          height: {
-            xs: "95vh", // Full height on phones
-            sm: "95vh", // Full height on phones
-            md: "80vh", // 80% height on tablets
-            lg: "80vh", // 70% height on laptops
-            xl: "80vh", // 60% height on desktops
-          },
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          paddingTop: 3,
-          border: 1,
-          borderColor: "grey.300",
-          borderRadius: 4,
-          overflow: "hidden",
-          backgroundColor: "white",
-        }}
-      >
-        <ChatWindow messages={messages} />
-        <ChatInput onSendMessage={handleSendMessage} />
-      </Container>
-    </Box>
+    <div translate="no">
+      <ThemeProvider theme={theme}>
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          sx={{
+            backgroundColor: "grey.100",
+          }}
+        >
+          <Container
+            maxWidth={false}
+            sx={{
+              width: {
+                xs: "95%", // Full width on extra-small screens (phones)
+                sm: "95%", // Full width on small screens (phones)
+                md: "80%", // 80% width on medium screens (tablets)
+                lg: "80%", // 70% width on large screens (laptops)
+                xl: "80%", // 60% width on extra-large screens (desktops)
+              },
+              height: {
+                xs: "95vh", // Full height on phones
+                sm: "95vh", // Full height on phones
+                md: "80vh", // 80% height on tablets
+                lg: "80vh", // 70% height on laptops
+                xl: "80vh", // 60% height on desktops
+              },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              paddingTop: 3,
+              border: 1,
+              borderColor: "grey.300",
+              borderRadius: 4,
+              overflow: "hidden",
+              backgroundColor: "white",
+            }}
+          >
+            <ChatWindow messages={messages} />
+            <ChatInput onSendMessage={handleSendMessage} />
+          </Container>
+        </Box>
+      </ThemeProvider>
+    </div>
   );
 }
 
