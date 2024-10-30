@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, styled } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SmartToyIcon from "@mui/icons-material/SmartToy";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ShareIcon from "@mui/icons-material/Share";
+import ReactMarkdown from "react-markdown";
 
-function ChatBubble({ msg, onCharacterTyped, setGenerating }) {
+// Create a styled Typography component
+const MarkdownContainer = styled(Typography)({
+  "& *": {
+    margin: 0, // This applies margin: 0 to all child elements
+  },
+});
+
+function ChatBubble({ msg, msgTextList, onCharacterTyped, setGenerating }) {
   const [displayedText, setDisplayedText] = useState(""); // The current portion of displayed text
   const [currentIndex, setCurrentIndex] = useState(0); // Index to keep track of characters to be typed
-  const typingInterval = 5; // Time interval in milliseconds
+  const typingInterval = 20; // Time interval in milliseconds
 
   // Effect to clear react useState cache when finished thinking
   useEffect(() => {
@@ -23,14 +31,14 @@ function ChatBubble({ msg, onCharacterTyped, setGenerating }) {
       return;
     }
     // Only start typing effect if it's a bot message
-    if (msg.sender === "bot" && currentIndex < msg.text.length) {
+    if (msg.sender === "bot" && currentIndex < msgTextList.length) {
       // Set timeout for typing effect
       const timeout = setTimeout(() => {
-        setDisplayedText((prev) => prev + msg.text[currentIndex]);
-        setCurrentIndex((prevIndex) => prevIndex + 1);
+        setDisplayedText((prev) => prev + " " + msgTextList[currentIndex]);
         if (onCharacterTyped) {
           onCharacterTyped();
         }
+        setCurrentIndex((prevIndex) => prevIndex + 1);
       }, typingInterval);
 
       // Cleanup the timeout if the component unmounts or msg changes
@@ -84,10 +92,24 @@ function ChatBubble({ msg, onCharacterTyped, setGenerating }) {
         maxWidth="75%"
         position="relative"
       >
-        <Typography sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-          {" "}
-          {displayedText}{" "}
-        </Typography>
+        <MarkdownContainer
+          component="div"
+          variant="body1"
+          sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+        >
+          <ReactMarkdown
+            components={{
+              ul: ({ node, ...props }) => (
+                <ul style={{ whiteSpace: "normal" }} {...props} />
+              ),
+              li: ({ node, ...props }) => (
+                <li style={{ whiteSpace: "normal" }} {...props} />
+              ),
+            }}
+          >
+            {displayedText}
+          </ReactMarkdown>
+        </MarkdownContainer>
 
         {msg.sender === "bot" && (
           <Box

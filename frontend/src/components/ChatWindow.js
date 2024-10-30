@@ -103,6 +103,7 @@ function ChatWindow({ messages }) {
           <ChatBubble
             key={index}
             msg={msg}
+            msgTextList={msg.text.split(" ")}
             onCharacterTyped={triggerScroll}
             setGenerating={setGenerating}
           />
