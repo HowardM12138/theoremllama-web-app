@@ -36,6 +36,15 @@ function App() {
     },
   ]);
 
+  const getContextWindow = () => {
+    // Select the last few messages to form the context
+    const MAX_CONTEXT_MESSAGES = 15;
+    const contextMessages = messages.slice(-MAX_CONTEXT_MESSAGES);
+    return contextMessages.map((msg) => ({
+      text: `${msg.sender}: ${msg.text}`,
+    }));
+  };
+
   // Function to handle sending a message
   const handleSendMessage = async (message) => {
     // Add the user's message to the chat
@@ -53,6 +62,9 @@ function App() {
     ]);
 
     try {
+      // Include context in the API call by appending the last few messages
+      const contextWindow = getContextWindow();
+      console.log(contextWindow);
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
         {
@@ -61,7 +73,9 @@ function App() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: message }] }],
+            contents: [
+              { parts: [...contextWindow, { text: `User: ${message}` }] },
+            ],
           }),
         }
       );
@@ -102,47 +116,47 @@ function App() {
   return (
     <div translate="no">
       <ThemeProvider theme={theme}>
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="100vh"
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          sx={{
+            backgroundColor: "grey.100",
+          }}
+        >
+          <Container
+            maxWidth={false}
             sx={{
-              backgroundColor: "grey.100",
+              width: {
+                xs: "95%", // Full width on extra-small screens (phones)
+                sm: "95%", // Full width on small screens (phones)
+                md: "80%", // 80% width on medium screens (tablets)
+                lg: "80%", // 70% width on large screens (laptops)
+                xl: "80%", // 60% width on extra-large screens (desktops)
+              },
+              height: {
+                xs: "95vh", // Full height on phones
+                sm: "95vh", // Full height on phones
+                md: "80vh", // 80% height on tablets
+                lg: "80vh", // 70% height on laptops
+                xl: "80vh", // 60% height on desktops
+              },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              paddingTop: 3,
+              border: 1,
+              borderColor: "grey.300",
+              borderRadius: 4,
+              overflow: "hidden",
+              backgroundColor: "white",
             }}
           >
-            <Container
-              maxWidth={false}
-              sx={{
-                width: {
-                  xs: "95%", // Full width on extra-small screens (phones)
-                  sm: "95%", // Full width on small screens (phones)
-                  md: "80%", // 80% width on medium screens (tablets)
-                  lg: "80%", // 70% width on large screens (laptops)
-                  xl: "80%", // 60% width on extra-large screens (desktops)
-                },
-                height: {
-                  xs: "95vh", // Full height on phones
-                  sm: "95vh", // Full height on phones
-                  md: "80vh", // 80% height on tablets
-                  lg: "80vh", // 70% height on laptops
-                  xl: "80vh", // 60% height on desktops
-                },
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                paddingTop: 3,
-                border: 1,
-                borderColor: "grey.300",
-                borderRadius: 4,
-                overflow: "hidden",
-                backgroundColor: "white",
-              }}
-            >
-              <ChatWindow messages={messages} />
-              <ChatInput onSendMessage={handleSendMessage} />
-            </Container>
-          </Box>
+            <ChatWindow messages={messages} />
+            <ChatInput onSendMessage={handleSendMessage} />
+          </Container>
+        </Box>
       </ThemeProvider>
     </div>
   );
