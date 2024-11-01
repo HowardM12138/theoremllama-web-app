@@ -144,17 +144,11 @@ function App() {
             sx={{
               width: {
                 xs: "100%", // Full width on extra-small screens (phones)
-                sm: "100%", // Full width on small screens (phones)
-                md: "85%", // 80% width on medium screens (tablets)
                 lg: "85%", // 70% width on large screens (laptops)
-                xl: "85%", // 60% width on extra-large screens (desktops)
               },
               height: {
                 xs: "100vh", // Full height on phones
-                sm: "100vh", // Full height on phones
-                md: "85vh", // 80% height on tablets
                 lg: "85vh", // 70% height on laptops
-                xl: "85vh", // 60% height on desktops
               },
               display: "flex",
               flexDirection: "column",
