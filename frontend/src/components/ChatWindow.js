@@ -65,11 +65,10 @@ function ChatWindow({ messages }) {
       display="flex"
       flexDirection="column"
       height="100%"
-      p={2}
       bgcolor="grey.100"
       sx={{
         borderRadius: "12px 12px 0 0",
-        overflow: "hidden",
+        overflow: "auto",
       }}
     >
       <Box
@@ -77,26 +76,12 @@ function ChatWindow({ messages }) {
         onScroll={handleScroll}
         flex={1}
         overflow="auto"
-        bgcolor="grey.100"
         display="flex"
-        mb={2}
         flexDirection="column"
         sx={{
-          maxHeight: "80vh",
-          paddingLeft: {
-            xs: 2, // Padding for extra-small screens (phones)
-            sm: 10, // Padding for small screens (phones)
-            md: 21, // Increased padding for medium screens (tablets)
-            lg: 28, // Larger padding for large screens (laptops)
-            xl: 35, // Even larger padding for extra-large screens (desktops)
-          },
-          paddingRight: {
-            xs: 2, // Padding for extra-small screens (phones)
-            sm: 10, // Padding for small screens (phones)
-            md: 21, // Increased padding for medium screens (tablets)
-            lg: 28, // Larger padding for large screens (laptops)
-            xl: 35, // Even larger padding for extra-large screens (desktops)
-          },
+          height: "100%",
+          maxHeight: "100%",
+          p: 2,
         }}
       >
         {messages.map((msg, index) => (
@@ -116,6 +101,7 @@ function ChatWindow({ messages }) {
           onClick={handleStopGeneration}
           sx={{
             backgroundColor: "#e0e0e0",
+            mb: 2,
             padding: "12px 16px",
             borderRadius: "12px",
             alignSelf: "center",

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import ChatWindow from "./components/ChatWindow";
 import ChatInput from "./components/ChatInput";
-import { Container, Box } from "@mui/material";
+import VoteBar from "./components/VoteBar";
+import getGeminiResponse from "./utils/GeminiApi";
+import { Container, Box, Grid2 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 // Generate unique ID for messages
 const generateUniqueId = () => `_${Math.random().toString(36).substr(2, 9)}`;
-const geminiApiKey = process.env.REACT_APP_GEMINI_API_KEY;
 
 const theme = createTheme({
   typography: {
@@ -28,22 +29,20 @@ const theme = createTheme({
 
 function App() {
   // State to keep track of chat messages
-  const [messages, setMessages] = useState([
+  const [messagesLeft, setMessagesLeft] = useState([
     {
       id: "thinking",
       sender: "bot",
       text: "What can I help you with today?",
     },
   ]);
-
-  const getContextWindow = () => {
-    // Select the last few messages to form the context
-    const MAX_CONTEXT_MESSAGES = 15;
-    const contextMessages = messages.slice(-MAX_CONTEXT_MESSAGES);
-    return contextMessages.map((msg) => ({
-      text: `${msg.sender}: ${msg.text}`,
-    }));
-  };
+  const [messagesRight, setMessagesRight] = useState([
+    {
+      id: "thinking",
+      sender: "bot",
+      text: "What can I help you with today?",
+    },
+  ]);
 
   // Function to handle sending a message
   const handleSendMessage = async (message) => {
@@ -55,35 +54,20 @@ function App() {
     };
     // Add a temporary "thinking" message for the bot
     const thinkingMessage = { id: "thinking", sender: "bot", text: "..." };
-    setMessages((prevMessages) => [
+    setMessagesLeft((prevMessages) => [
+      ...prevMessages,
+      userMessage,
+      thinkingMessage,
+    ]);
+    setMessagesRight((prevMessages) => [
       ...prevMessages,
       userMessage,
       thinkingMessage,
     ]);
 
+    // Fetch LEFT panel api response
     try {
-      // Include context in the API call by appending the last few messages
-      const contextWindow = getContextWindow();
-      console.log(contextWindow);
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [
-              { parts: [...contextWindow, { text: `User: ${message}` }] },
-            ],
-          }),
-        }
-      );
-      const data = await response.json();
-      // Extract the response text from the data
-      const botResponseText =
-        data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-        "Sorry, I didn't understand that.";
+      const botResponseText = await getGeminiResponse(messagesLeft, message);
 
       const botResponse = {
         id: generateUniqueId(),
@@ -91,7 +75,7 @@ function App() {
         text: botResponseText,
       };
       // Replace the "thinking" message with the actual bot response
-      setMessages((prevMessages) => {
+      setMessagesLeft((prevMessages) => {
         const updatedMessages = [...prevMessages];
         updatedMessages.pop();
         return [...updatedMessages, botResponse];
@@ -105,7 +89,37 @@ function App() {
         text: "Error: Unable to fetch response.",
       };
 
-      setMessages((prevMessages) => {
+      setMessagesLeft((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages.pop(); // Remove the "thinking" message
+        return [...updatedMessages, errorMessage];
+      });
+    }
+    // Fetch RIGHT panel api response
+    try {
+      const botResponseText = await getGeminiResponse(messagesRight, message);
+
+      const botResponse = {
+        id: generateUniqueId(),
+        sender: "bot",
+        text: botResponseText,
+      };
+      // Replace the "thinking" message with the actual bot response
+      setMessagesRight((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        updatedMessages.pop();
+        return [...updatedMessages, botResponse];
+      });
+    } catch (error) {
+      console.error("Error calling the Gemini API:", error);
+      // Handle errors
+      const errorMessage = {
+        id: generateUniqueId(),
+        sender: "bot",
+        text: "Error: Unable to fetch response.",
+      };
+
+      setMessagesRight((prevMessages) => {
         const updatedMessages = [...prevMessages];
         updatedMessages.pop(); // Remove the "thinking" message
         return [...updatedMessages, errorMessage];
@@ -129,32 +143,77 @@ function App() {
             maxWidth={false}
             sx={{
               width: {
-                xs: "95%", // Full width on extra-small screens (phones)
-                sm: "95%", // Full width on small screens (phones)
-                md: "80%", // 80% width on medium screens (tablets)
-                lg: "80%", // 70% width on large screens (laptops)
-                xl: "80%", // 60% width on extra-large screens (desktops)
+                xs: "100%", // Full width on extra-small screens (phones)
+                sm: "100%", // Full width on small screens (phones)
+                md: "85%", // 80% width on medium screens (tablets)
+                lg: "85%", // 70% width on large screens (laptops)
+                xl: "85%", // 60% width on extra-large screens (desktops)
               },
               height: {
-                xs: "95vh", // Full height on phones
-                sm: "95vh", // Full height on phones
-                md: "80vh", // 80% height on tablets
-                lg: "80vh", // 70% height on laptops
-                xl: "80vh", // 60% height on desktops
+                xs: "100vh", // Full height on phones
+                sm: "100vh", // Full height on phones
+                md: "85vh", // 80% height on tablets
+                lg: "85vh", // 70% height on laptops
+                xl: "85vh", // 60% height on desktops
               },
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
-              paddingTop: 3,
+              paddingTop: { xs: 0, lg: 2 },
+              paddingX: { xs: 0, lg: 2 },
               border: 1,
               borderColor: "grey.300",
-              borderRadius: 4,
+              borderRadius: { xs: 0, lg: 4 },
               overflow: "hidden",
               backgroundColor: "white",
             }}
           >
-            <ChatWindow messages={messages} />
-            <ChatInput onSendMessage={handleSendMessage} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                overflow: "hidden",
+              }}
+            >
+              <Grid2
+                container
+                spacing={2}
+                direction={{ xs: "column", lg: "row" }}
+                sx={{ flex: 1, height: "100%", overflow: "hidden" }}
+              >
+                <Grid2
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    flex: 1,
+                    height: { xs: "50%", lg: "100%" },
+                    overflow: "auto",
+                  }}
+                >
+                  <ChatWindow messages={messagesLeft} />
+                </Grid2>
+                <Grid2
+                  item
+                  xs={12}
+                  md={6}
+                  sx={{
+                    flex: 1,
+                    height: { xs: "50%", lg: "100%" },
+                    overflow: "auto",
+                  }}
+                >
+                  <ChatWindow messages={messagesRight} />
+                </Grid2>
+              </Grid2>
+            </Box>
+            <Box sx={{ width: "100%", display: {lg: "block", xs: "none"} }}>
+              <VoteBar></VoteBar>
+            </Box>
+            <Box sx={{ width: "100%" }}>
+              <ChatInput onSendMessage={handleSendMessage} />
+            </Box>
           </Container>
         </Box>
       </ThemeProvider>
