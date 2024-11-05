@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ChatWindow from "./components/ChatWindow";
 import ChatInput from "./components/ChatInput";
 import VoteBar from "./components/VoteBar";
+import VoteStatsBar from "./components/VoteStatsBar";
 import getGeminiResponse from "./utils/GeminiApi";
 import { Container, Box, Grid2 } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -44,6 +45,9 @@ function App() {
     },
   ]);
 
+  const [leftVotes, setLeftVotes] = useState(10); // State to keep track number of left votes
+  const [rightVotes, setRightVotes] = useState(10); // State to keep track number of left votes
+
   // Function to handle sending a message
   const handleSendMessage = async (message) => {
     // Add the user's message to the chat
@@ -80,6 +84,15 @@ function App() {
         updatedMessages.pop();
         return [...updatedMessages, botResponse];
       });
+
+      // Using random number to mimic backend correct/incorrect label for now
+      if (Math.random() < 0.5) {
+        setLeftVotes((prev) => prev + 1);
+        setRightVotes((prev) => prev - 1);
+      } else {
+        setLeftVotes((prev) => prev - 1);
+        setRightVotes((prev) => prev + 1);
+      }
     } catch (error) {
       console.error("Error calling the Gemini API:", error);
       // Handle errors
@@ -162,6 +175,10 @@ function App() {
               backgroundColor: "white",
             }}
           >
+            <VoteStatsBar
+              leftVotes={leftVotes}
+              rightVotes={rightVotes}
+            ></VoteStatsBar>
             <Box
               sx={{
                 display: "flex",
@@ -186,7 +203,7 @@ function App() {
                     overflow: "auto",
                   }}
                 >
-                  <ChatWindow messages={messagesLeft} />
+                  <ChatWindow messages={messagesLeft} votes={leftVotes} />
                 </Grid2>
                 <Grid2
                   item
@@ -198,12 +215,16 @@ function App() {
                     overflow: "auto",
                   }}
                 >
-                  <ChatWindow messages={messagesRight} />
+                  <ChatWindow messages={messagesRight} votes={rightVotes} />
                 </Grid2>
               </Grid2>
             </Box>
-            <Box sx={{ width: "100%", display: {lg: "block", xs: "none"} }}>
-              <VoteBar></VoteBar>
+            <Box sx={{ width: "100%", display: { lg: "block", xs: "none" } }}>
+              <VoteBar
+                setLeftVotes={setLeftVotes}
+                setRightVotes={setRightVotes}
+                messages={messagesRight}
+              ></VoteBar>
             </Box>
             <Box sx={{ width: "100%" }}>
               <ChatInput onSendMessage={handleSendMessage} />
