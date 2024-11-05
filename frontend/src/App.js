@@ -219,7 +219,7 @@ function App() {
                 </Grid2>
               </Grid2>
             </Box>
-            <Box sx={{ width: "100%", display: { lg: "block", xs: "none" } }}>
+            <Box sx={{ width: "100%" }}>
               <VoteBar
                 setLeftVotes={setLeftVotes}
                 setRightVotes={setRightVotes}
